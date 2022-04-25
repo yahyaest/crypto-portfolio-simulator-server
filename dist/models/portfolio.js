@@ -37,7 +37,7 @@ function validatePortfolio(portfolio) {
         userId: Joi.string()
             .regex(/^[0-9a-fA-F]{24}$/)
             .required(),
-        intialValue: Joi.number().min(0).required(),
+        value: Joi.number().min(0).required(),
         transactions: Joi.array().required(),
     });
     return schema.validate(portfolio);

@@ -10,6 +10,7 @@ interface Itransaction extends Document {
   cryptoPrice: number;
   cryptoShares: number;
   transactionValue: number;
+  [key: string]: any;
 }
 
 const transactionSchema: Schema = new mongoose.Schema({

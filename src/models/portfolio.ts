@@ -6,6 +6,7 @@ interface Iportfolio extends Document {
   initialValue: number;
   currentValue: number;
   transactions: string[];
+  [key: string]: any;
 }
 
 const portfolioSchema: Schema = new mongoose.Schema({
@@ -25,7 +26,7 @@ export function validatePortfolio(portfolio: object) {
     userId: Joi.string()
       .regex(/^[0-9a-fA-F]{24}$/)
       .required(),
-    intialValue: Joi.number().min(0).required(),
+    value: Joi.number().min(0).required(),
     transactions: Joi.array().required(),
   });
 

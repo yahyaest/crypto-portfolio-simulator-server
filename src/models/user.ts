@@ -5,6 +5,7 @@ interface IUser extends Document {
   username: string;
   email: string;
   password: string;
+  [key: string]: any;
 }
 
 const userSchema: Schema = new mongoose.Schema({
