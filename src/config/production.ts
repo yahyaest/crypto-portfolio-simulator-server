@@ -1,6 +1,5 @@
 import { config } from "dotenv";
 
-// dotenv
 config();
 
 export const config_prod = {

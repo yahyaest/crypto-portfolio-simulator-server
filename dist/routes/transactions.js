@@ -29,6 +29,7 @@ const router = express_1.Router();
 router.use(express_1.default.json());
 router.get("/", transactions.getTransactions);
 router.get("/:id", validateObjectId_1.default, transactions.getTransaction);
+router.post("/portfolio-transactions", transactions.getPortfolioTransactions);
 router.post("/", transactions.createTransaction);
 router.put("/:id", validateObjectId_1.default, transactions.updateTransaction);
 router.patch("/:id", validateObjectId_1.default, transactions.patchTransaction);

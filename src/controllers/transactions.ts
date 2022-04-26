@@ -1,5 +1,4 @@
 import { Transaction, validateTransaction } from "../models/transaction";
-import { User } from "../models/user";
 import { RequestHandler } from "express";
 
 export const getTransactions: RequestHandler = async (req, res) => {
@@ -10,7 +9,6 @@ export const getTransactions: RequestHandler = async (req, res) => {
 export const getTransaction: RequestHandler = async (req, res) => {
   try {
     const transaction = await Transaction.findById(req.params.id);
-    // If not existing return 404 - Not found ////
     if (!transaction)
       return res
         .status(404)
@@ -23,13 +21,22 @@ export const getTransaction: RequestHandler = async (req, res) => {
   }
 };
 
+export const getPortfolioTransactions: RequestHandler = async (req, res) => {
+  try {
+    const transactions = await Transaction.find({
+      portfolioId: req.body.portfolioId,
+    });
+    if (!transactions)
+      return res.status(404).send("No Transactions for given portfolioId .");
+    res.send(transactions);
+  } catch (e) {
+    return res.status(404).send("No Transactions for given portfolioId .");
+  }
+};
+
 export const createTransaction: RequestHandler = async (req, res) => {
-  // If invalid return 400 - Bad request
   const { error } = validateTransaction(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-
-  const user = await User.findById(req.body.userId);
-  if (!user) return res.status(400).send("Invalid user.");
 
   const transaction = new Transaction({
     portfolioId: req.body.portfolioId,
@@ -46,34 +53,29 @@ export const createTransaction: RequestHandler = async (req, res) => {
 };
 
 export const updateTransaction: RequestHandler = async (req, res) => {
-  // If invalid return 400 - Bad request 
   const { error } = validateTransaction(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const user = await User.findById(req.body.userId);
-  if (!user) return res.status(400).send("Invalid user.");
+  const transaction = await Transaction.findByIdAndUpdate(
+    req.params.id,
+    {
+      portfolioId: req.body.portfolioId,
+      transactionType: req.body.transactionType,
+      transactionState: req.body.transactionState,
+      cryptoName: req.body.cryptoName,
+      cryptoPrice: req.body.cryptoPrice,
+      cryptoShares: req.body.cryptoShares,
+      transactionValue: req.body.transactionValue,
+    },
+    { new: true }
+  );
 
-    const transaction = await Transaction.findByIdAndUpdate(
-      req.params.id,
-      {
-        portfolioId: req.body.portfolioId,
-        transactionType: req.body.transactionType,
-        transactionState: req.body.transactionState,
-        cryptoName: req.body.cryptoName,
-        cryptoPrice: req.body.cryptoPrice,
-        cryptoShares: req.body.cryptoShares,
-        transactionValue: req.body.transactionValue,
-      },
-      { new: true }
-    );
+  if (!transaction)
+    return res
+      .status(404)
+      .send("The transaction with the given id was not found.");
 
-    // If not existing return 404 - Not found 
-    if (!transaction)
-      return res
-        .status(404)
-        .send("The transaction with the given id was not found.");
-
-    res.send(transaction);
+  res.send(transaction);
 };
 
 export const patchTransaction: RequestHandler = async (req, res) => {
@@ -99,7 +101,6 @@ export const deleteTransaction: RequestHandler = async (req, res) => {
   try {
     const transaction = await Transaction.findByIdAndRemove(req.params.id);
 
-    // If not existing return 404 - Not found
     if (!transaction)
       return res
         .status(404)

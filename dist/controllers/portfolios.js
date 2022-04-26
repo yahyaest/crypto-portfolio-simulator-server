@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletePortfolio = exports.patchPortfolio = exports.updatePortfolio = exports.createPortfolio = exports.getPortfolio = exports.getMyPortfolio = exports.getPortfolios = void 0;
+exports.deletePortfolio = exports.patchPortfolio = exports.updatePortfolio = exports.createPortfolio = exports.getCurrentPortfolio = exports.getPortfolio = exports.getMyPortfolio = exports.getPortfolios = void 0;
 const portfolio_1 = require("../models/portfolio");
 const user_1 = require("../models/user");
 const getPortfolios = async (req, res) => {
@@ -22,7 +22,6 @@ exports.getMyPortfolio = getMyPortfolio;
 const getPortfolio = async (req, res) => {
     try {
         const portfolio = await portfolio_1.Portfolio.findById(req.params.id);
-        // If not existing return 404 - Not found
         if (!portfolio)
             return res
                 .status(404)
@@ -36,8 +35,23 @@ const getPortfolio = async (req, res) => {
     }
 };
 exports.getPortfolio = getPortfolio;
+const getCurrentPortfolio = async (req, res) => {
+    try {
+        const portfolio = await portfolio_1.Portfolio.find({ userId: req.body.userId });
+        if (!portfolio)
+            return res
+                .status(404)
+                .send("The portfolio with the given id was not found.");
+        res.send(portfolio);
+    }
+    catch (e) {
+        return res
+            .status(404)
+            .send("The portfolio with the given id was not found.");
+    }
+};
+exports.getCurrentPortfolio = getCurrentPortfolio;
 const createPortfolio = async (req, res) => {
-    // If invalid return 400 - Bad request ////
     const { error } = portfolio_1.validatePortfolio(req.body);
     if (error)
         return res.status(400).send(error.details[0].message);
@@ -58,7 +72,6 @@ const createPortfolio = async (req, res) => {
 };
 exports.createPortfolio = createPortfolio;
 const updatePortfolio = async (req, res) => {
-    // If invalid return 400 - Bad request
     const { error } = portfolio_1.validatePortfolio(req.body);
     if (error)
         return res.status(400).send(error.details[0].message);
@@ -71,7 +84,6 @@ const updatePortfolio = async (req, res) => {
         intialValue: req.body.intialValue,
         currentValue: req.body.value,
     }, { new: true });
-    // If not existing return 404 - Not found
     if (!portfolio)
         return res
             .status(404)
@@ -100,7 +112,6 @@ exports.patchPortfolio = patchPortfolio;
 const deletePortfolio = async (req, res) => {
     try {
         const portfolio = await portfolio_1.Portfolio.findByIdAndRemove(req.params.id);
-        // If not existing return 404 - Not found
         if (!portfolio)
             return res
                 .status(404)

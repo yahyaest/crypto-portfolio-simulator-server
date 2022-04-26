@@ -29,6 +29,7 @@ const router = express_1.Router();
 router.use(express_1.default.json());
 router.get("/", portfolios.getPortfolios);
 router.get("/me", portfolios.getMyPortfolio);
+router.post("/current-portfolio", portfolios.getCurrentPortfolio);
 router.get("/:id", validateObjectId_1.default, portfolios.getPortfolio);
 router.post("/", portfolios.createPortfolio);
 router.put("/:id", validateObjectId_1.default, portfolios.updatePortfolio);

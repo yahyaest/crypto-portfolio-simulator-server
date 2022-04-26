@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteTransaction = exports.patchTransaction = exports.updateTransaction = exports.createTransaction = exports.getTransaction = exports.getTransactions = void 0;
+exports.deleteTransaction = exports.patchTransaction = exports.updateTransaction = exports.createTransaction = exports.getPortfolioTransactions = exports.getTransaction = exports.getTransactions = void 0;
 const transaction_1 = require("../models/transaction");
-const user_1 = require("../models/user");
 const getTransactions = async (req, res) => {
     const transactions = await transaction_1.Transaction.find().sort("date");
     res.send(transactions);
@@ -11,7 +10,6 @@ exports.getTransactions = getTransactions;
 const getTransaction = async (req, res) => {
     try {
         const transaction = await transaction_1.Transaction.findById(req.params.id);
-        // If not existing return 404 - Not found ////
         if (!transaction)
             return res
                 .status(404)
@@ -25,14 +23,24 @@ const getTransaction = async (req, res) => {
     }
 };
 exports.getTransaction = getTransaction;
+const getPortfolioTransactions = async (req, res) => {
+    try {
+        const transactions = await transaction_1.Transaction.find({
+            portfolioId: req.body.portfolioId,
+        });
+        if (!transactions)
+            return res.status(404).send("No Transactions for given portfolioId .");
+        res.send(transactions);
+    }
+    catch (e) {
+        return res.status(404).send("No Transactions for given portfolioId .");
+    }
+};
+exports.getPortfolioTransactions = getPortfolioTransactions;
 const createTransaction = async (req, res) => {
-    // If invalid return 400 - Bad request
     const { error } = transaction_1.validateTransaction(req.body);
     if (error)
         return res.status(400).send(error.details[0].message);
-    const user = await user_1.User.findById(req.body.userId);
-    if (!user)
-        return res.status(400).send("Invalid user.");
     const transaction = new transaction_1.Transaction({
         portfolioId: req.body.portfolioId,
         transactionType: req.body.transactionType,
@@ -47,13 +55,9 @@ const createTransaction = async (req, res) => {
 };
 exports.createTransaction = createTransaction;
 const updateTransaction = async (req, res) => {
-    // If invalid return 400 - Bad request 
     const { error } = transaction_1.validateTransaction(req.body);
     if (error)
         return res.status(400).send(error.details[0].message);
-    const user = await user_1.User.findById(req.body.userId);
-    if (!user)
-        return res.status(400).send("Invalid user.");
     const transaction = await transaction_1.Transaction.findByIdAndUpdate(req.params.id, {
         portfolioId: req.body.portfolioId,
         transactionType: req.body.transactionType,
@@ -63,7 +67,6 @@ const updateTransaction = async (req, res) => {
         cryptoShares: req.body.cryptoShares,
         transactionValue: req.body.transactionValue,
     }, { new: true });
-    // If not existing return 404 - Not found 
     if (!transaction)
         return res
             .status(404)
@@ -91,7 +94,6 @@ exports.patchTransaction = patchTransaction;
 const deleteTransaction = async (req, res) => {
     try {
         const transaction = await transaction_1.Transaction.findByIdAndRemove(req.params.id);
-        // If not existing return 404 - Not found
         if (!transaction)
             return res
                 .status(404)

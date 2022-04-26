@@ -9,6 +9,8 @@ router.get("/", portfolios.getPortfolios);
 
 router.get("/me", portfolios.getMyPortfolio as any);
 
+router.post("/current-portfolio", portfolios.getCurrentPortfolio);
+
 router.get("/:id", validateObjectId, portfolios.getPortfolio);
 
 router.post("/", portfolios.createPortfolio);

@@ -22,18 +22,30 @@ export const getConnectedUser = async (
 
 export const getUser: RequestHandler = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    // If not existing return 404 - Not found
+    const user = await User.find({ email: req.body.email });
     if (!user)
-      return res.status(404).send("The user with the given id was not found.");
+      return res.status(404).send("The user with the given email was not found.");
     res.send(user);
   } catch (e) {
-    return res.status(404).send("The user with the given id was not found.");
+    return res.status(404).send("The user with the given email was not found.");
+  }
+};
+
+export const userLogin: RequestHandler = async (req, res) => {
+  try {
+    const user = await User.find({
+      email: req.body.email,
+      password: req.body.password,
+    });
+    if (user.length === 0)
+      return res.status(404).send("The user was not found.");
+    res.send(user);
+  } catch (e) {
+    return res.status(404).send("The user was not found.");
   }
 };
 
 export const createUser: RequestHandler = async (req, res) => {
-  // If invalid return 400 - Bad request
   const { error } = validateUser(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -51,7 +63,6 @@ export const createUser: RequestHandler = async (req, res) => {
 };
 
 export const updateUser: RequestHandler = async (req, res) => {
-  // If invalid return 400 - Bad request
   const { error } = validateUser(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -65,7 +76,6 @@ export const updateUser: RequestHandler = async (req, res) => {
     { new: true }
   );
 
-  // If not existing return 404 - Not found
   if (!user)
     return res.status(404).send("The user with the given id was not found.");
 
@@ -93,7 +103,6 @@ export const deleteUser: RequestHandler = async (req, res) => {
   try {
     const user = await User.findByIdAndRemove(req.params.id);
 
-    // If not existing return 404 - Not found 
     if (!user)
       return res.status(404).send("The user with the given id was not found.");
 

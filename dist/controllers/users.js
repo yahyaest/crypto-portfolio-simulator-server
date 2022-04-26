@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteUser = exports.patchUser = exports.updateUser = exports.createUser = exports.getUser = exports.getConnectedUser = exports.getUsers = void 0;
+exports.deleteUser = exports.patchUser = exports.updateUser = exports.createUser = exports.userLogin = exports.getUser = exports.getConnectedUser = exports.getUsers = void 0;
 const user_1 = require("../models/user");
 const getUsers = async (req, res) => {
     const users = await user_1.User.find().sort("username");
@@ -14,19 +14,32 @@ const getConnectedUser = async (req, res) => {
 exports.getConnectedUser = getConnectedUser;
 const getUser = async (req, res) => {
     try {
-        const user = await user_1.User.findById(req.params.id);
-        // If not existing return 404 - Not found
+        const user = await user_1.User.find({ email: req.body.email });
         if (!user)
-            return res.status(404).send("The user with the given id was not found.");
+            return res.status(404).send("The user with the given email was not found.");
         res.send(user);
     }
     catch (e) {
-        return res.status(404).send("The user with the given id was not found.");
+        return res.status(404).send("The user with the given email was not found.");
     }
 };
 exports.getUser = getUser;
+const userLogin = async (req, res) => {
+    try {
+        const user = await user_1.User.find({
+            email: req.body.email,
+            password: req.body.password,
+        });
+        if (user.length === 0)
+            return res.status(404).send("The user was not found.");
+        res.send(user);
+    }
+    catch (e) {
+        return res.status(404).send("The user was not found.");
+    }
+};
+exports.userLogin = userLogin;
 const createUser = async (req, res) => {
-    // If invalid return 400 - Bad request
     const { error } = user_1.validateUser(req.body);
     if (error)
         return res.status(400).send(error.details[0].message);
@@ -43,7 +56,6 @@ const createUser = async (req, res) => {
 };
 exports.createUser = createUser;
 const updateUser = async (req, res) => {
-    // If invalid return 400 - Bad request
     const { error } = user_1.validateUser(req.body);
     if (error)
         return res.status(400).send(error.details[0].message);
@@ -52,7 +64,6 @@ const updateUser = async (req, res) => {
         email: req.body.email,
         password: req.body.password,
     }, { new: true });
-    // If not existing return 404 - Not found
     if (!user)
         return res.status(404).send("The user with the given id was not found.");
     res.send(user);
@@ -76,7 +87,6 @@ exports.patchUser = patchUser;
 const deleteUser = async (req, res) => {
     try {
         const user = await user_1.User.findByIdAndRemove(req.params.id);
-        // If not existing return 404 - Not found 
         if (!user)
             return res.status(404).send("The user with the given id was not found.");
         res.send(user);

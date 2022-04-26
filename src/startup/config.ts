@@ -1,7 +1,6 @@
 import { config_prod as configProd } from "../config/production";
 import { config } from "dotenv";
 
-// dotenv
 config();
 
 export const appConfig = () => {

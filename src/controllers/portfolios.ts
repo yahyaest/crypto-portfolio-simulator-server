@@ -31,7 +31,21 @@ export const getMyPortfolio = async (
 export const getPortfolio: RequestHandler = async (req, res) => {
   try {
     const portfolio = await Portfolio.findById(req.params.id);
-    // If not existing return 404 - Not found
+    if (!portfolio)
+      return res
+        .status(404)
+        .send("The portfolio with the given id was not found.");
+    res.send(portfolio);
+  } catch (e) {
+    return res
+      .status(404)
+      .send("The portfolio with the given id was not found.");
+  }
+};
+
+export const getCurrentPortfolio: RequestHandler = async (req, res) => {
+  try {
+    const portfolio = await Portfolio.find({ userId: req.body.userId });
     if (!portfolio)
       return res
         .status(404)
@@ -45,7 +59,6 @@ export const getPortfolio: RequestHandler = async (req, res) => {
 };
 
 export const createPortfolio: RequestHandler = async (req, res) => {
-  // If invalid return 400 - Bad request ////
   const { error } = validatePortfolio(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -67,7 +80,6 @@ export const createPortfolio: RequestHandler = async (req, res) => {
 };
 
 export const updatePortfolio: RequestHandler = async (req, res) => {
-  // If invalid return 400 - Bad request
   const { error } = validatePortfolio(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -85,7 +97,6 @@ export const updatePortfolio: RequestHandler = async (req, res) => {
     { new: true }
   );
 
-  // If not existing return 404 - Not found
   if (!portfolio)
     return res
       .status(404)
@@ -106,7 +117,6 @@ export const patchPortfolio: RequestHandler = async (req, res) => {
       (portfolio[key] || portfolio[key] === 0) &&
       portfolio[key] !== req.body[key]
     )
- 
       query.$set[key] = req.body[key];
     await Portfolio.updateOne({ _id: req.params.id }, query, {
       runValidators: true,
@@ -119,7 +129,6 @@ export const deletePortfolio: RequestHandler = async (req, res) => {
   try {
     const portfolio = await Portfolio.findByIdAndRemove(req.params.id);
 
-    // If not existing return 404 - Not found
     if (!portfolio)
       return res
         .status(404)

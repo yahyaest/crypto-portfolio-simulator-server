@@ -9,6 +9,8 @@ router.get("/", transactions.getTransactions);
 
 router.get("/:id", validateObjectId, transactions.getTransaction);
 
+router.post("/portfolio-transactions", transactions.getPortfolioTransactions);
+
 router.post("/", transactions.createTransaction);
 
 router.put("/:id", validateObjectId, transactions.updateTransaction);

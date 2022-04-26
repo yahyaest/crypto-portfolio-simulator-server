@@ -9,8 +9,9 @@ router.use(express.json());
 router.get("/", users.getUsers);
 
 router.get("/me", users.getConnectedUser as any);
+router.post("/login", users.userLogin);
 
-router.get("/:id", validateObjectId, users.getUser);
+router.post("/current-user", users.getUser);
 
 router.post("/", users.createUser);
 
