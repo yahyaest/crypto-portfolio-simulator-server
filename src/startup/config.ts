@@ -5,6 +5,6 @@ config();
 
 export const appConfig = () => {
   if (!configProd.jwtPrivateKey) {
-    throw new Error("FATAL ERROR : jwtPrivateKey is not defined.");
+    // throw new Error("FATAL ERROR : jwtPrivateKey is not defined.");
   }
 };

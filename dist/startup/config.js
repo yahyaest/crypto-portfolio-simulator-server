@@ -6,7 +6,7 @@ const dotenv_1 = require("dotenv");
 dotenv_1.config();
 const appConfig = () => {
     if (!production_1.config_prod.jwtPrivateKey) {
-        throw new Error("FATAL ERROR : jwtPrivateKey is not defined.");
+        // throw new Error("FATAL ERROR : jwtPrivateKey is not defined.");
     }
 };
 exports.appConfig = appConfig;
