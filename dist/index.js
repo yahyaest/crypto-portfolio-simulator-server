@@ -17,5 +17,5 @@ dotenv_1.config();
 db_1.db();
 config_1.appConfig();
 validation_1.validation();
-const port = process.env.port || 4000;
+const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`Listening on ${port} ...`));
